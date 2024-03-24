@@ -1,4 +1,4 @@
-function [sys,x0,str,ts,simStateCompliance] = PenduloFuruta(t,x,u,flag,xi,la,lp,ma,mp,M,J,g)
+function [sys,x0,str,ts,simStateCompliance] = ModeloFuruta(t,x,u,flag,xi,g,Phi,dPhi,Tau,dTau,J,M_2,l_bi,C_x,C_z,I_x,I_z,B_p,B_u,d)
 
 
 % The following outlines the general structure of an S-function.
@@ -108,24 +108,25 @@ end
 % Return the derivatives for the continuous states.
 %=============================================================================
 %
-function sys=mdlDerivatives(t,x,u,la,lp,ma,mp,M,J,g)
+function sys=mdlDerivatives(t,x,u,g,Phi,dPhi,Tau,dTau,J,M_2,l_bi,C_x,C_z,I_x,I_z,B_p,B_u,d)
+%Definimos la matriz A y sus componentes, para realizar el cálculo de la
+%linealización
+a_13 = M_2*g*C_z(J+2*M_2*l_bi*C_x+M_2*l_bi^2+I_z)/d;
+a_33 = -(J+2*M_2*l_bi*C_x+M_2*l_bi^2+I_z)*B_p/d;
+a_34 = -(M_2*l_bi*C_z*B_u)/d;
+a_14 = (M_2^2)*(C_z)^2*l_bi*g/d;
+a_34 = -M_2*l_bi*C_z*B_p/d;
+a_44 = -I_x*B_u/d;
+A = [0      0       1       0;
+     0      0       0       1;
+     a_13   0       a_33    a_34;
+     a_14   0       a_34    a_44];
+%falta agregar lo que es tau o la entrada para que quede de la manera 
+% dx = Ax+Btau
 
 
-x1=x(1);
-x2=x(2);
-x3=x(3);
-x4=x(4);
 
 
-a = J+((ma/3)+mp+M)*(la^2);
-b = ((mp/3)+M)*(lp^2);
-c = ((mp/2)+M)*la*lp; %y
-d =  ((mp/2)+M)*g*lp;
-
-sys(1) = x2;
-sys(2)=(b*u-b*c*cos(x3)^2*sin(x3)*(x2)^2-2*b^2*cos(x3)*sin(x3)*x4+b*c*sin(x3)*(x4)^2-c*d*cos(x3)*sin(x3))/(a*b-c^2+(b^2+c^2)*sin(x3)^2);
-sys(3)=x4;
-sys(4)=(b*(a+b*sin(x3)^2)*cos(x3)*sin(x3)*(x2)^2+2*b*c*cos(x3)^2*sin(x3)*x4*x2-c^2*cos(x3)*sin(x3)*((x4)^2)-c*u*cos(x3))/(a*b-c^2+(b^2+c^2)*sin(x3)^2);
 end
 % end mdlDerivatives
 
