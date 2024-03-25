@@ -71,8 +71,8 @@ sizes = simsizes;
 
 sizes.NumContStates  = 4; %Estados continuos
 sizes.NumDiscStates  = 0; %Estados discretos
-sizes.NumOutputs     = 4; %salidas
-sizes.NumInputs      = 1; %entradas
+sizes.NumOutputs     = 2; %salidas
+sizes.NumInputs      = 2; %entradas
 sizes.DirFeedthrough = 1;
 sizes.NumSampleTimes = 1;   % at least one sample time is needed
 
@@ -121,10 +121,18 @@ A = [0      0       1       0;
      0      0       0       1;
      a_13   0       a_33    a_34;
      a_14   0       a_34    a_44];
+
+B = [0;
+     0;
+     M_2*l_bi*C_z/d;
+    I_x/d];
+
+sys = A*x + B*Tau;
+
 %falta agregar lo que es tau o la entrada para que quede de la manera 
 % dx = Ax+Btau
 
-
+    
 
 
 end
