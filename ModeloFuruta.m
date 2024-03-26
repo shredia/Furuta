@@ -1,197 +1,129 @@
-function [sys,x0,str,ts,simStateCompliance] = ModeloFuruta(t,x,u,flag,xi,g,Phi,dPhi,Tau,dTau,J,M_2,l_bi,C_x,C_z,I_x,I_z,B_p,B_u,d)
+function [sys,x0,str,ts,simStateCompliance] = ModeloFuruta(t,x,u,flag,Phi,dPhi,Tau,dTau)
+% Esta función S-Function modela el sistema del péndulo Furuta.
+
+% Definición de constantes
+g = 9.81;       % Valor de la gravedad
+Phi = pi;       % Valor de Phi
+dPhi = 0;       % Velocidad angular de Phi
+Tau = 0;        % Tau
+dTau = 0;       % Velocidad angular de Tau
+j = 0.0185;     % Valor de J
+m_2 = 98;       % Valor de M_2
+l_bi = 8.7;     % Valor de l_bi
+c_x = -2.3;     % Valor de C_x
+c_z = 4.4;      % Valor de C_z
+i_x = 4.39e-4;  % Valor de I_x
+i_z = 1.88e-4;  % Valor de I_z
+b_p = 1;        % Valor de B_p
+b_u = 1;        % Valor de B_u
+t = 1;
+t_fu = 1;
+t_fp = 1;
+
+%Ecuacion sistema no-lineal
+M11 = j + m_2*l_bi^2 + 2*m_2*l_bi*m_x + m_z + m_x*sind(Phi).^2;
+M12 = m_2*l_bi*c_z*cosd(Phi);
+M21 = m_2*l_bi*c_z*cosd(Phi);
+M22 = i_x;
+
+M = [M11 M12;
+     M21 M22];
+
+D11 = 2*i_x*dPhi*sind(Phi)*cosd(Phi);
+D12 = -m_2*l_bi*c_z*sind(Phi)*dPhi;
+D21 = -dTau*i_x*cosd(Phi)*sind(Phi);
+D22 = 0;
+
+D = [D11 D12;
+     D21 D22];
+
+F = [0;m_2*g*c_z*sind(Phi)];
+U = [t + t_fu;t_fp];
 
 
-% The following outlines the general structure of an S-function.
-%
-switch flag,
 
-  %%%%%%%%%%%%%%%%%%
-  % Initialization %
-  %%%%%%%%%%%%%%%%%%
-  case 0,
-    [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes(xi);
 
-  %%%%%%%%%%%%%%%
-  % Derivatives %
-  %%%%%%%%%%%%%%%
-  case 1,
-    sys=mdlDerivatives(t,x,u,la,lp,ma,mp,M,J,g);
-
-  %%%%%%%%%%
-  % Update %
-  %%%%%%%%%%
-  case 2,
-    sys=mdlUpdate(t,x,u);
-
-  %%%%%%%%%%%
-  % Outputs %
-  %%%%%%%%%%%
-  case 3,
-    sys=mdlOutputs(t,x,u);
-
-  %%%%%%%%%%%%%%%%%%%%%%%
-  % GetTimeOfNextVarHit %
-  %%%%%%%%%%%%%%%%%%%%%%%
-  case 4,
-    sys=mdlGetTimeOfNextVarHit(t,x,u);
-
-  %%%%%%%%%%%%%
-  % Terminate %
-  %%%%%%%%%%%%%
-  case 9,
-    sys=mdlTerminate(t,x,u);
-
-  %%%%%%%%%%%%%%%%%%%%
-  % Unexpected flags %
-  %%%%%%%%%%%%%%%%%%%%
-  otherwise
+% Manejo de los diferentes flags
+switch flag
+  case 0 % Inicialización
+    [sys,x0,str,ts,simStateCompliance] = mdlInitializeSizes(A,B,C,D,xi);
+  case 1 % Derivadas
+    sys = mdlDerivatives(t,x,u,A,B);
+  case 2 % Actualización
+    sys = mdlUpdate(t,x,u);
+  case 3 % Salidas
+    sys = mdlOutputs(t,x,u,C,D);
+  case 4 % Próximo hit de tiempo variable
+    sys = mdlGetTimeOfNextVarHit(t,x,u);
+  case 9 % Terminación
+    sys = mdlTerminate(t,x,u);
+  otherwise % Manejo de errores
     DAStudio.error('Simulink:blocks:unhandledFlag', num2str(flag));
+end
 
 end
 
-% end sfuntmpl
+function [sys, x0, str, ts, simStateCompliance] = mdlInitializeSizes(A, B, C, D)
+% Inicialización de tamaños y estados iniciales
 
-%
-%=============================================================================
-% mdlInitializeSizes
-% Return the sizes, initial conditions, and sample times for the S-function.
-%=============================================================================
-%
-    function [sys,x0,str,ts,simStateCompliance]=mdlInitializeSizes(xi)
-
-    %
-    % call simsizes for a sizes structure, fill it in and convert it to a
-    % sizes array.
-%
-% Note that in this example, the values are hard coded.  This is not a
-% recommended practice as the characteristics of the block are typically
-% defined by the S-function parameters.
-%
 sizes = simsizes;
-
-sizes.NumContStates  = 4; %Estados continuos
-sizes.NumDiscStates  = 0; %Estados discretos
-sizes.NumOutputs     = 2; %salidas
-sizes.NumInputs      = 2; %entradas
-sizes.DirFeedthrough = 1;
-sizes.NumSampleTimes = 1;   % at least one sample time is needed
+sizes.NumContStates = 0; % No hay estados continuos
+sizes.NumDiscStates = 0; % No hay estados discretos
+sizes.NumOutputs = size(C, 1); % Número de salidas
+sizes.NumInputs = size(B, 2); % Número de entradas
+sizes.DirFeedthrough = 0;
+sizes.NumSampleTimes = 1;
 
 sys = simsizes(sizes);
 
-%
-% initialize the initial conditions
-% condicones iniciales
-x0  = xi;
-
-%
-% str is always an empty matrix
-%
+x0 = []; % No hay estados iniciales
 str = [];
+ts = [0 0]; % Un único tiempo de muestreo
 
-%
-% initialize the array of sample times
-%
-ts  = [0 0];
-
-% Specify the block simStateCompliance. The allowed values are:
-%    'UnknownSimState', < The default setting; warn and assume DefaultSimState
-%    'DefaultSimState', < Same sim state as a built-in block
-%    'HasNoSimState',   < No sim state
-%    'DisallowSimState' < Error out when saving or restoring the model sim state
 simStateCompliance = 'UnknownSimState';
+
+% Inicializar las matrices del sistema
+sys.A = A;
+sys.B = B;
+sys.C = C;
+sys.D = D;
 end
-% end mdlInitializeSizes
 
-%
-%=============================================================================
-% mdlDerivatives
-% Return the derivatives for the continuous states.
-%=============================================================================
-%
-function sys=mdlDerivatives(t,x,u,g,Phi,dPhi,Tau,dTau,J,M_2,l_bi,C_x,C_z,I_x,I_z,B_p,B_u,d)
-%Definimos la matriz A y sus componentes, para realizar el cálculo de la
-%linealización
-a_13 = M_2*g*C_z(J+2*M_2*l_bi*C_x+M_2*l_bi^2+I_z)/d;
-a_33 = -(J+2*M_2*l_bi*C_x+M_2*l_bi^2+I_z)*B_p/d;
-a_34 = -(M_2*l_bi*C_z*B_u)/d;
-a_14 = (M_2^2)*(C_z)^2*l_bi*g/d;
-a_34 = -M_2*l_bi*C_z*B_p/d;
-a_44 = -I_x*B_u/d;
-A = [0      0       1       0;
-     0      0       0       1;
-     a_13   0       a_33    a_34;
-     a_14   0       a_34    a_44];
+function sys = mdlDerivatives(t, x, u, A, B)
+% Calculamos las derivadas de los estados del sistema
 
-B = [0;
-     0;
-     M_2*l_bi*C_z/d;
-    I_x/d];
+% Definimos la matriz de estados
+X_T = [x(1) - pi; x(2); x(3); x(4)];
 
-sys = A*x + B*Tau;
-
-%falta agregar lo que es tau o la entrada para que quede de la manera 
-% dx = Ax+Btau
-
-    
-
-
+% Calculamos las derivadas utilizando las matrices A y B
+sys = inv(M)*[U-D]
 end
-% end mdlDerivatives
 
-%
-%=============================================================================
-% mdlUpdate
-% Handle discrete state updates, sample time hits, and major time step
-% requirements.
-%=============================================================================
-%
-function sys=mdlUpdate(t,x,u)
+function sys = mdlUpdate(t,x,u)
+% Actualización de estados
 
 sys = [];
 end
-% end mdlUpdate
 
-%
-%=============================================================================
-% mdlOutputs
-% Return the block outputs.
-%=============================================================================
-%
-function sys=mdlOutputs(t,x,u)
-%salidas, primera angulo del brazo, segunda angulo del pendulo
-sys =  [x(1);x(2);x(3);x(4)];
+function sys = mdlOutputs(t, x, u, C, D)
+% Calculamos las salidas del bloque
+
+% Definimos la matriz de estados
+X_T = [x(1) - pi; x(2); x(3); x(4)];
+
+% Calculamos las salidas utilizando las matrices C y D
+sys = C * X_T + D * u;
 end
-% end mdlOutputs
 
-%
-%=============================================================================
-% mdlGetTimeOfNextVarHit
-% Return the time of the next hit for this block.  Note that the result is
-% absolute time.  Note that this function is only used when you specify a
-% variable discrete-time sample time [-2 0] in the sample time array in
-% mdlInitializeSizes.
-%=============================================================================
-%
-function sys=mdlGetTimeOfNextVarHit(t,x,u)
+function sys = mdlGetTimeOfNextVarHit(t,x,u)
+% Determinación del próximo hit de tiempo variable
 
-sampleTime = 1;    %  Example, set the next hit to be one second later.
+sampleTime = 1;
 sys = t + sampleTime;
 end
-% end mdlGetTimeOfNextVarHit
 
-%
-%=============================================================================
-% mdlTerminate
-% Perform any end of simulation tasks.
-%=============================================================================
-%
-function sys=mdlTerminate(t,x,u)
+function sys = mdlTerminate(t,x,u)
+% Tareas al finalizar la simulación
 
 sys = [];
 end
-
-end
-
-
-
-
