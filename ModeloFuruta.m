@@ -20,28 +20,38 @@ t = 1;
 t_fu = 1;
 t_fp = 1;
 
-%Ecuacion sistema no-lineal
-M11 = j + m_2*l_bi^2 + 2*m_2*l_bi*m_x + m_z + m_x*sind(Phi).^2;
-M12 = m_2*l_bi*c_z*cosd(Phi);
-M21 = m_2*l_bi*c_z*cosd(Phi);
-M22 = i_x;
+%Ecuacion sistema lineal
+d = (j + 2*m_2*l_bi*c_x + m_2*l_bi^2 +i_z)*i_x;
+X11 = 0;
+X12 = 0;
+X13 = m_2*g*c_z*(j+2*m_2*l_bi*c_x+m_2*l_bi^2+i_z);
+X14 = m_2^2*c_z^2*l_bi*g/(d);
 
-M = [M11 M12;
-     M21 M22];
+X21 = 0;
+X22 = 0;
+X23 = 0;
+X24 = 0;
 
-D11 = 2*i_x*dPhi*sind(Phi)*cosd(Phi);
-D12 = -m_2*l_bi*c_z*sind(Phi)*dPhi;
-D21 = -dTau*i_x*cosd(Phi)*sind(Phi);
-D22 = 0;
+X31 = 1;
+X32 = 0;
+X33 = (j+2*m_2*l_bi*c_x+m_2*l_bi^2+i_z)*b_p;
+X34 = -m_2*l_bi*c_z*b_p/d;
 
-D = [D11 D12;
-     D21 D22];
+X41 = 0;
+X42 = 1;
+X43 = -m_2*l_bi*c_z*b_u/d;
+X44 = -i_x*b_u/d;
 
-F = [0;m_2*g*c_z*sind(Phi)];
-U = [t + t_fu;t_fp];
+A = [X11 X21 X31 X41;X12 X22 X32 X42;X13 X23 X33 X43;X14 X24 X34 X44];
 
+B1 = 0;
+B2 = 0;
+B3 = m_2*l_bi*c_z/d;
+B4 = i_x/d;
+B = [B1;B2;B3;B4];
 
-
+C = [1 0 0 0];
+D = 0;
 
 % Manejo de los diferentes flags
 switch flag
@@ -89,14 +99,14 @@ sys.C = C;
 sys.D = D;
 end
 
-function sys = mdlDerivatives(t, x, u, A, B)
+function sys=mdlDerivatives(t, x, u, A, B)
 % Calculamos las derivadas de los estados del sistema
 
 % Definimos la matriz de estados
 X_T = [x(1) - pi; x(2); x(3); x(4)];
 
 % Calculamos las derivadas utilizando las matrices A y B
-sys = inv(M)*[U-D]
+sys =  A* X_T + B*u;
 end
 
 function sys = mdlUpdate(t,x,u)
