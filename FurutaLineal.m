@@ -5,7 +5,7 @@ function FurutaLineal(block)
   setup(block);
   
 function setup(block)
-  
+  %%xd
   %% Register number of dialog parameters   
   block.NumDialogPrms = 0;
 
