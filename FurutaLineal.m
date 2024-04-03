@@ -10,8 +10,8 @@ function setup(block)
   block.NumDialogPrms = 0;
 
   %% Register number of input and output ports
-  block.NumInputPorts  = 2;
-  block.NumOutputPorts = 1;
+  block.NumInputPorts  = 3;
+  block.NumOutputPorts = 4;
 
   %% Setup functional port properties to dynamically
   %% inherited.
@@ -22,9 +22,14 @@ function setup(block)
   block.InputPort(1).DirectFeedthrough = false;
   block.InputPort(2).Dimensions        = 1;
   block.InputPort(2).DirectFeedthrough = false;
+  block.InputPort(3).Dimensions        = 1;
+  block.InputPort(3).DirectFeedthrough = false;
+  
   
   block.OutputPort(1).Dimensions       = 1;
-  %block.OutputPort(2).Dimensions       = 1;
+  block.OutputPort(2).Dimensions       = 1;
+  block.OutputPort(3).Dimensions       = 1;
+  block.OutputPort(4).Dimensions       = 1;
   
   %% Set block sample time to continuous
   block.SampleTimes = [0 0];
@@ -42,6 +47,9 @@ function setup(block)
 function Output(block)
 
   block.OutputPort(1).Data = block.ContStates.Data(1);
+  block.OutputPort(2).Data = block.ContStates.Data(2);
+  block.OutputPort(3).Data = block.ContStates.Data(3);
+  block.OutputPort(4).Data = block.ContStates.Data(4);
 
 function Derivative(block)
     % Definición de constantes
@@ -55,57 +63,67 @@ function Derivative(block)
     C_z = 4.4;      % Valor de C_z
     I_x = 4.39e-4;  % Valor de I_x
     I_z = 1.88e-4;  % Valor de I_z
-
+    b_p = 1;
+    b_u = 1;
     % Entradas
-    Tau_fu = 1;
-    Tau_fp = 1;
+    
+    
+    d = (J + 2*M_2*l_bi*C_x + M_2*l_bi^2 + I_z)*I_x - M_2^2*l_bi^2*C_z^2;
+    B11 = 0;
+    B21 = 0;
+    B31 = M_2*l_bi*C_z/d;
+    B41 = I_x/d;
+    
+    B12 = 0;
+    B22 = 0;
+    B32 = 0;
+    B42 = 0;
+    
 
-    u(1) = block.InputPort(1).Data;
-    u(2) = block.InputPort(2).Data;
-    % Ecuaciones U
-    u(1) = Tau + Tau_fu;
-    u(2) = Tau_fp;
+ 
     % Matriz U
-    U = [u(1); u(2)];
+    B = [B11 B12;
+         B21 B22;
+         B31 B32;
+         B41 B42];
+    %%XAB A FILA B COLUMNA
 
-    x(1) = block.ContStates.Data(1);
-    x(2) = block.ContStates.Data(2);
-    x(3) = block.ContStates.Data(3);
-    x(4) = block.ContStates.Data(4);
+    %PRIMERA COLUMNA
+    A11 = 0;
+    A21 = 0;
+    A31 = M_2*g*C_z*(J+2*M_2*l_bi*C_x+M_2*l_bi^2+I_z)/d;
+    A41 = M_2^2*C_z^2*l_bi*g/d;
+    
+    %SEGUNDA COLUMNA
+    A12 = 0;
+    A22 = 0;
+    A32 = 0;
+    A42 = 0;
 
-    % Matriz Qp
-    Qp = [x(3); x(4)];
+      %TERCERA COLUMNA
+    A13 = 1;
+    A23 = 0;
+    A33 = -1*(J + 2*M_2*l_bi*C_x + M_2*l_bi^2 + I_z)*b_p/d;
+    A43 = -1*M_2*l_bi*C_z*b_p/d;
 
-    % Ecuaciones de matriz M(theta)
-    Mtheta1_1 = J + M_2 * (l_bi)^2 + 2 * M_2 * l_bi * C_x + I_z + I_x * sin(x(1)) * sin(x(1));
-    Mtheta2_1 = M_2 * l_bi * C_z * cos(x(1));
-    Mtheta1_2 = M_2 * l_bi * C_z * cos(x(1));
-    Mtheta2_2 = I_x;
+      %CUARTA COLUMNA
+    A14 = 0;
+    A24 = 1;
+    A34 = -1*M_2*l_bi*C_z*b_u/d;
+    A44 = -1*I_x*b_u/d;
 
-    % matriz M(theta)
-    M = [Mtheta1_1, Mtheta2_1; Mtheta1_2, Mtheta2_2];
-
-    % Ecuaciones de matriz D(theta,Phi)
-    DthetaPhi1_1 = 2 * I_x * x(3) * sin(x(1)) * cos(x(1));
-    DthetaPhi1_2 = -x(4) * I_x * cos(x(1)) * sin(x(1));
-    DthetaPhi2_1 = M_2 * l_bi * C_z * sin(x(1)) * x(3);
-    DthetaPhi2_2 = 0;
-
-    % matriz D(theta,Phi)
-    D = [DthetaPhi1_1, DthetaPhi2_1; DthetaPhi1_2, DthetaPhi2_2];
-
-    % Ecuaciones de matriz F(theta)
-    Ftheta1_1 = 0;
-    Ftheta1_2 = M_2 * g * C_z * sin(x(1));
-
-    % matriz F(theta)
-    F = [Ftheta1_1; Ftheta1_2];
-
-    % Derivadas
-    dx = inv(M) * (U - D * Qp - F);
-
-    % Asignar derivadas al bloque
-    block.Derivatives.Data(1) = x(3);
-    block.Derivatives.Data(2) = x(4);
-    block.Derivatives.Data(3) = dx(1);
-    block.Derivatives.Data(4) = dx(2);
+    A = [A11 A12 A13 A14;
+         A21 A22 A23 A24;
+         A31 A32 A33 A34;
+         A41 A42 A43 A44];
+   x1 = block.ContStates.Data(1);
+   x2 = block.ContStates.Data(2);
+   x3 = block.ContStates.Data(3);
+   x4 = block.ContStates.Data(4);
+   x = [x1;x2;x3;x4];
+   Tau = [block.InputPort(1).Data];
+   Tau_fu = [block.InputPort(2).Data];
+   Tau_fp = [block.InputPort(3).Data];
+    U = [Tau + Tau_fu; Tau_fp];
+   dx_dt = A * x + B * U;
+   block.Derivatives.Data = dx_dt;

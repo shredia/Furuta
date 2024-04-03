@@ -13,8 +13,8 @@ function setup(block)
   block.NumDialogPrms = 0;
 
   %% Registrar el número de puertos de entrada y salida
-  block.NumInputPorts  = 2;
-  block.NumOutputPorts = 1;
+  block.NumInputPorts  = 3;
+  block.NumOutputPorts = 4;
 
   %% Configurar propiedades de puerto funcional para heredar dinámicamente
   block.SetPreCompInpPortInfoToDynamic;
@@ -26,6 +26,9 @@ function setup(block)
   block.InputPort(2).DirectFeedthrough = false;
 
   block.OutputPort(1).Dimensions       = 1;
+   block.OutputPort(2).Dimensions       = 1;
+    block.OutputPort(3).Dimensions       = 1;
+     block.OutputPort(4).Dimensions       = 1;
   
   %% Establecer el tiempo de muestreo del bloque a continuo
   block.SampleTimes = [0 0];
@@ -50,6 +53,9 @@ end
 
 function Output(block)
   block.OutputPort(1).Data = block.ContStates.Data(1);
+  block.OutputPort(2).Data = block.ContStates.Data(2);
+  block.OutputPort(3).Data = block.ContStates.Data(3);
+  block.OutputPort(4).Data = block.ContStates.Data(4);
 end
 
 function Derivative(block)
@@ -68,15 +74,16 @@ function Derivative(block)
   B_u = 1;        % Valor de B_u
 
   % Entradas
-  Tau_fu = block.InputPort(1).Data;
-  Tau_fp = block.InputPort(2).Data;
+  Tau = block.InputPort(1).Data;
+  Tau_fu = block.InputPort(2).Data;
+  Tau_fp = block.InputPort(3).Data;
 
   % Ecuaciones de U
-  Tau = Tau + Tau_fu;
-  dTau = Tau_fp;
-
+ 
+  
+  
   % Matriz U
-  U = [Tau; dTau];
+  U = [Tau + Tau_fu; Tau + Tau_fp];
 
   % Estados
   theta = block.ContStates.Data(1);
