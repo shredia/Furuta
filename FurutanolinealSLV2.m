@@ -24,6 +24,8 @@ function setup(block)
   block.InputPort(1).DirectFeedthrough = false;
   block.InputPort(2).Dimensions        = 1;
   block.InputPort(2).DirectFeedthrough = false;
+  block.InputPort(3).Dimensions        = 1;
+  block.InputPort(3).DirectFeedthrough = false;
 
   block.OutputPort(1).Dimensions       = 1;
    block.OutputPort(2).Dimensions       = 1;
@@ -40,7 +42,7 @@ function setup(block)
   block.SimStateCompliance = 'DefaultSimState';
 
   %% Registrar métodos
-  block.RegBlockMethod('InitializeConditions',    @InitConditions);  
+  block.RegBlockMethod('InitializeConditions', @InitConditions);
   block.RegBlockMethod('Outputs',                 @Output);  
   block.RegBlockMethod('Derivatives',             @Derivative);  
 
@@ -48,6 +50,10 @@ end
 
 function InitConditions(block)
   % Inicializar Dwork
+    block.ContStates.Data(1) = 0;  % Estado 1
+    block.ContStates.Data(2) = pi; % Estado 2
+    block.ContStates.Data(3) = 0;  % Estado 3
+    block.ContStates.Data(4) = 0;  % Estado 4
   
 end
 
@@ -61,7 +67,7 @@ end
 function Derivative(block)
   % Definir las constantes
   g = 9.81;       % Valor de la gravedad
-  Tau = 0;        % Tau
+  
   dTau = 0;       % Velocidad angular de Tau
   J = 0.0185;     % Valor de J
   M_2 = 98;       % Valor de M_2
@@ -83,38 +89,38 @@ function Derivative(block)
   
   
   % Matriz U
-  U = [Tau + Tau_fu; Tau + Tau_fp];
+  U = [Tau + Tau_fu; Tau_fp];
 
   % Estados
-  theta = block.ContStates.Data(1);
-  phi = block.ContStates.Data(2);
-  dtheta = block.ContStates.Data(3);
-  dphi = block.ContStates.Data(4);
+  
+  
+  
+  
 
   % Matriz Qp
-  Qp = [dtheta; dphi];
+  Qp = [block.ContStates.Data(3); block.ContStates.Data(4)];
 
   % Matriz M(theta)
-  Mtheta1_1 = J + M_2 * (l_bi)^2 + 2 * M_2 * l_bi * C_x + I_z + I_x * sin(theta) * sin(theta);
-  Mtheta2_1 = M_2 * l_bi * C_z * cos(theta);
-  Mtheta1_2 = M_2 * l_bi * C_z * cos(theta);
+  Mtheta1_1 = J + M_2 * (l_bi)^2 + 2 * M_2 * l_bi * C_x + I_z + I_x * sind(block.ContStates.Data(1)) * sin(block.ContStates.Data(1));
+  Mtheta2_1 = M_2 * l_bi * C_z * cosd(block.ContStates.Data(1));
+  Mtheta1_2 = M_2 * l_bi * C_z * cosd(block.ContStates.Data(1));
   Mtheta2_2 = I_x;
   M = [Mtheta1_1, Mtheta2_1; Mtheta1_2, Mtheta2_2];
 
   % Matriz D(theta, Phi)
-  DthetaPhi1_1 = 2 * I_x * dtheta * sin(theta) * cos(theta);
-  DthetaPhi1_2 = -dphi * I_x * cos(theta) * sin(theta);
-  DthetaPhi2_1 = M_2 * l_bi * C_z * sin(theta) * dtheta;
+  DthetaPhi1_1 = 2 * I_x * block.ContStates.Data(3) * sind(block.ContStates.Data(1)) * cosd(block.ContStates.Data(1));
+  DthetaPhi1_2 = -block.ContStates.Data(4) * I_x * cosd(block.ContStates.Data(1)) * sind(block.ContStates.Data(1));
+  DthetaPhi2_1 = M_2 * l_bi * C_z * sind(block.ContStates.Data(1)) * block.ContStates.Data(3);
   DthetaPhi2_2 = 0;
   D = [DthetaPhi1_1, DthetaPhi2_1; DthetaPhi1_2, DthetaPhi2_2];
 
   % Matriz F(theta)
   Ftheta1_1 = 0;
-  Ftheta1_2 = M_2 * g * C_z * sin(theta);
+  Ftheta1_2 = M_2 * g * C_z * sind(block.ContStates.Data(1));
   F = [Ftheta1_1; Ftheta1_2];
 
   % Derivadas
-  dx = [dtheta; dphi; inv(M) * (U - D * Qp - F)];
+  dx = [block.ContStates.Data(3); block.ContStates.Data(4); inv(M) * (U - D * Qp - F)];
 
   % Asignar derivadas al bloque
   block.Derivatives.Data(1) = dx(1);
