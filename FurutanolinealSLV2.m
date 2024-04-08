@@ -68,7 +68,7 @@ function Derivative(block)
   % Definir las constantes
   g = 9.81;       % Valor de la gravedad
   
-  dTau = 0;       % Velocidad angular de Tau
+  
   J = 0.0185;     % Valor de J
   M_2 = 98;       % Valor de M_2
   l_bi = 8.7;     % Valor de l_bi

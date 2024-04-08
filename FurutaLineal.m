@@ -52,19 +52,19 @@ end
 
 function InitConditions(block)
     
-    block.ContStates.Data(1) = pi;  % Phi
-    block.ContStates.Data(2) = 0;   % Theta
-    block.ContStates.Data(3) = 0;   % dPhi
-    block.ContStates.Data(4) = 0;   % dTheta
+    block.ContStates.Data(1) = pi;  % Theta
+    block.ContStates.Data(2) = 0;   % Phi
+    block.ContStates.Data(3) = 0;   %dTheta
+    block.ContStates.Data(4) = 0;   %dPhi
 end
 
 
 
 function Output(block)
-    block.OutputPort(1).Data = block.ContStates.Data(1);
-    block.OutputPort(2).Data = block.ContStates.Data(2);
-    block.OutputPort(3).Data = block.ContStates.Data(3);
-    block.OutputPort(4).Data = block.ContStates.Data(4);
+    block.OutputPort(1).Data = block.ContStates.Data(1); %Theta
+    block.OutputPort(2).Data = block.ContStates.Data(2); %Phi
+    block.OutputPort(3).Data = block.ContStates.Data(3); %dTheta
+    block.OutputPort(4).Data = block.ContStates.Data(4); %dPhi
     
 end
 
@@ -135,4 +135,5 @@ function Derivative(block)
     block.Derivatives.Data = dx_dt;
     assignin('base', 'A', A);
     assignin('base', 'B', B);
+    
 end
