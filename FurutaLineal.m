@@ -71,8 +71,7 @@ end
 function Derivative(block)
     % Definición de constantes
     g = 9.81;       % Valor de la gravedad
-    Tau = 0;        % Tau
-    dTau = 0;       % Velocidad angular de Tau
+           
     J = 0.0185;     % Valor de J
     M_2 = 98;       % Valor de M_2
     l_bi = 8.7;     % Valor de l_bi
@@ -80,8 +79,7 @@ function Derivative(block)
     C_z = 4.4;      % Valor de C_z
     I_x = 4.39e-4;  % Valor de I_x
     I_z = 1.88e-4;  % Valor de I_z
-    b_p = 1;
-    b_u = 1;
+    
 
     % Entradas
     Tau = block.InputPort(1).Data;
@@ -115,13 +113,13 @@ function Derivative(block)
 
     A13 = 1;
     A23 = 0;
-    A33 = -1*(J + 2*M_2*l_bi*C_x + M_2*l_bi^2 + I_z)*b_p/d;
-    A43 = -1*M_2*l_bi*C_z*b_p/d;
+    A33 = 0;
+    A43 = 0;
 
     A14 = 0;
     A24 = 1;
-    A34 = -1*M_2*l_bi*C_z*b_u/d;
-    A44 = -1*I_x*b_u/d;
+    A34 = 0;
+    A44 = 0;
 
     A = [A11 A12 A13 A14; A21 A22 A23 A24; A31 A32 A33 A34; A41 A42 A43 A44];
 
@@ -133,7 +131,6 @@ function Derivative(block)
     U = [Tau + Tau_fu; Tau_fp];
     dx_dt = A * x + B * U;
     block.Derivatives.Data = dx_dt;
-    assignin('base', 'A', A);
-    assignin('base', 'B', B);
+    
     
 end
