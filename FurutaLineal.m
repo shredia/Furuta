@@ -72,10 +72,10 @@ function Derivative(block)
     % Definición de constantes
     g = 9.81;       % Valor de la gravedad
            
-    J = 0.0185;     % Valor de J
-    M_2 = 98;       % Valor de M_2
+    J = 0.0321;     % Valor de J
+    M_2 = 98/1000;       % Valor de M_2
     l_bi = 8.7;     % Valor de l_bi
-    C_x = -2.3;     % Valor de C_x
+    C_x = -4/100;     % Valor de C_x
     C_z = 4.4;      % Valor de C_z
     I_x = 4.39e-4;  % Valor de I_x
     I_z = 1.88e-4;  % Valor de I_z

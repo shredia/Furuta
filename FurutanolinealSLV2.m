@@ -69,15 +69,14 @@ function Derivative(block)
   g = 9.81;       % Valor de la gravedad
   
   
-  J = 0.0185;     % Valor de J
-  M_2 = 98;       % Valor de M_2
-  l_bi = 8.7;     % Valor de l_bi
-  C_x = -2.3;     % Valor de C_x
-  C_z = 4.4;      % Valor de C_z
+  J = 0.0321;     % Valor de J
+  M_2 = 98/1000;       % Valor de M_2
+  l_bi = 8.7;     % Valor de l_bi %%falta dividir por 100 pero se indefine
+  C_x = -4/100;     % Valor de C_x
+  C_z = 4.4;      % Valor de C_z %es 4.4/100, pero se indefine
   I_x = 4.39e-4;  % Valor de I_x
-  I_z = 1.88e-4;  % Valor de I_z
-  B_p = 1;        % Valor de B_p
-  B_u = 1;        % Valor de B_u
+  I_z = 2.24e-4;  % Valor de I_z
+  
 
   % Entradas
   Tau = block.InputPort(1).Data;
@@ -120,7 +119,7 @@ function Derivative(block)
   F = [Ftheta1_1; Ftheta1_2];
 
   % Derivadas
-  dx = [block.ContStates.Data(3); block.ContStates.Data(4); inv(M) * (U - D * Qp - F)];
+  dx = [block.ContStates.Data(4); block.ContStates.Data(3); inv(M) * (U - D * Qp - F)];
 
   % Asignar derivadas al bloque
   block.Derivatives.Data(1) = dx(1);
