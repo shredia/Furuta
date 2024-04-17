@@ -13,7 +13,7 @@ function setup(block)
   block.NumDialogPrms = 0;
 
   %% Registrar el número de puertos de entrada y salida
-  block.NumInputPorts  = 1;
+  block.NumInputPorts  = 4;
   block.NumOutputPorts = 5;
 
   %% Configurar propiedades de puerto funcional para heredar dinámicamente
@@ -22,11 +22,18 @@ function setup(block)
 
   block.InputPort(1).Dimensions        = 1;
   block.InputPort(1).DirectFeedthrough = false;
+  block.InputPort(2).Dimensions        = 1;
+  block.InputPort(2).DirectFeedthrough = false;
+  block.InputPort(3).Dimensions        = 1;
+  block.InputPort(3).DirectFeedthrough = false;
+  block.InputPort(4).Dimensions        = 1;
+  block.InputPort(4).DirectFeedthrough = false;
   
   block.OutputPort(1).Dimensions       = 1;
    block.OutputPort(2).Dimensions       = 1;
     block.OutputPort(3).Dimensions       = 1;
      block.OutputPort(4).Dimensions       = 1;
+     block.OutputPort(5).Dimensions       = 1;
   
   %% Establecer el tiempo de muestreo del bloque a continuo
   block.SampleTimes = [0 0];
@@ -80,20 +87,19 @@ function Derivative(block)
     
 
   % Entradas
-  V = block.InputPort(1).Data;
+
  
 
   % Ecuaciones de U
  
   
-  
+ 
   % Matriz U
-  U = [Tau + Tau_fu; Tau_fp];
-
+  
+    
   % Estados
   
-  
-  
+    U = [K*block.ContStates.Data(5);0];
   
 
   % Matriz Qp
@@ -117,14 +123,18 @@ function Derivative(block)
   Ftheta1_1 = 0;
   Ftheta1_2 = M_2 * g * C_z * sind(block.ContStates.Data(1));
   F = [Ftheta1_1; Ftheta1_2];
-
+  %Cálculo de corriente
+  di = (block.InputPort(1).Data - R*block.ContStates.Data(5) - K*block.ContStates.Data(3))/L;
   % Derivadas
-  dx = [block.ContStates.Data(4); block.ContStates.Data(3); M\(U - D * Qp - F)];
-  dx = []
-
+  dx = [block.ContStates.Data(3); block.ContStates.Data(4); M\(U - D * Qp - F);di];
+  
+  block.ContStates.Data(1) = block.InputPort(2).Data;
+  block.ContStates.Data(2) = block.InputPort(3).Data;
+  block.ContStates.Data(5) = block.InputPort(4).Data;
   % Asignar derivadas al bloque
   block.Derivatives.Data(1) = dx(1);
   block.Derivatives.Data(2) = dx(2);
-  block.Derivatives.Data(3) = dx(3);
-  block.Derivatives.Data(4) = dx(4);
+  block.Derivatives.Data(3) = dx(4);
+  block.Derivatives.Data(4) = dx(3);
+  block.Derivatives.Data(5) = dx(5);
 end
