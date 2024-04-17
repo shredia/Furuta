@@ -13,7 +13,7 @@ function setup(block)
   block.NumDialogPrms = 0;
 
   %% Registrar el número de puertos de entrada y salida
-  block.NumInputPorts  = 4;
+  block.NumInputPorts  = 1;
   block.NumOutputPorts = 5;
 
   %% Configurar propiedades de puerto funcional para heredar dinámicamente
@@ -22,12 +22,7 @@ function setup(block)
 
   block.InputPort(1).Dimensions        = 1;
   block.InputPort(1).DirectFeedthrough = false;
-  block.InputPort(2).Dimensions        = 1;
-  block.InputPort(2).DirectFeedthrough = false;
-  block.InputPort(3).Dimensions        = 1;
-  block.InputPort(3).DirectFeedthrough = false;
-  block.InputPort(4).Dimensions        = 1;
-  block.InputPort(4).DirectFeedthrough = false;
+
   
   block.OutputPort(1).Dimensions       = 1;
    block.OutputPort(2).Dimensions       = 1;
@@ -128,9 +123,7 @@ function Derivative(block)
   % Derivadas
   dx = [block.ContStates.Data(3); block.ContStates.Data(4); M\(U - D * Qp - F);di];
   
-  block.ContStates.Data(1) = block.InputPort(2).Data;
-  block.ContStates.Data(2) = block.InputPort(3).Data;
-  block.ContStates.Data(5) = block.InputPort(4).Data;
+
   % Asignar derivadas al bloque
   block.Derivatives.Data(1) = dx(1);
   block.Derivatives.Data(2) = dx(2);

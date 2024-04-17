@@ -10,7 +10,7 @@ function setup(block)
     block.NumDialogPrms = 0;
 
     %% Register number of input and output ports
-    block.NumInputPorts  = 4;
+    block.NumInputPorts  = 1;
     block.NumOutputPorts = 5;
 
     %% Setup functional port properties to dynamically
@@ -20,14 +20,6 @@ function setup(block)
 
     block.InputPort(1).Dimensions        = 1;
     block.InputPort(1).DirectFeedthrough = false;
-    block.InputPort(2).Dimensions        = 1;
-    block.InputPort(2).DirectFeedthrough = false;
-    
-    block.InputPort(3).Dimensions        = 1;
-    block.InputPort(3).DirectFeedthrough = false;
-    
-    block.InputPort(4).Dimensions        = 1;
-    block.InputPort(4).DirectFeedthrough = false;
     
     
 
@@ -100,7 +92,7 @@ function Derivative(block)
 
     % Entradas
     
-    A = [0, 0, 1, 0, 0; 0, 0, 0, 1, 0; 0, (C_z^2*M_2^2*g*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J), 0, 0, I_x/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J); 0, -(C_z*M_2^2*g*l_bi^2 + C_z*I_z*M_2*g + C_z*J*M_2*g + 2*C_x*C_z*M_2^2*g*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J), 0, 0, (C_z*M_2*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J); 0, 0, 0, K/L, -R/L];
+    A = [0, 0, 1, 0, 0; 0, 0, 0, 1, 0; (C_z*M_2^2*g*l_bi^2 + C_z*I_z*M_2*g + C_z*J*M_2*g + 2*C_x*C_z*M_2^2*g*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J), 0, 0, 0, (C_z*K*M_2*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J); (C_z^2*M_2^2*g*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J), 0, 0, 0, (I_x*K)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J); 0, 0, 0, -K/L, -R/L]
    
     
 
