@@ -72,34 +72,24 @@ end
 
 function Derivative(block)
     % Definición de constantes
-    g = 9.81;       % Valor de la gravedad
-           
-    J = 0.0321;     % Valor de J
-    M_2 = 98/1000;       % Valor de M_2
-    l_bi = 8.7;     % Valor de l_bi
-    C_x = -4/100;     % Valor de C_x
-    C_z = 4.4;      % Valor de C_z
-    I_x = 4.39e-4;  % Valor de I_x
-    I_z = 1.88e-4;  % Valor de I_z
+
     K = 1.32;
     R = 9.3;
     L = 43.1;
     
-  block.ContStates.Data(1) = block.InputPort(2).Data;
-  block.ContStates.Data(2) = block.InputPort(3).Data;
-  block.ContStates.Data(5) = block.InputPort(4).Data;
+
 
 
     % Entradas
     
-    A = [0, 0, 1, 0, 0; 0, 0, 0, 1, 0; (C_z*M_2^2*g*l_bi^2 + C_z*I_z*M_2*g + C_z*J*M_2*g + 2*C_x*C_z*M_2^2*g*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J), 0, 0, 0, (C_z*K*M_2*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J); (C_z^2*M_2^2*g*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J), 0, 0, 0, (I_x*K)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J); 0, 0, 0, -K/L, -R/L]
+    A = [0, 0, 1, 0, 0; 0, 0, 0, 1, 0; (C_z*M_2^2*g*l_bi^2 + C_z*I_z*M_2*g + C_z*J*M_2*g + 2*C_x*C_z*M_2^2*g*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J), 0, 0, 0, (C_z*K*M_2*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J); (C_z^2*M_2^2*g*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J), 0, 0, 0, (I_x*K)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J); 0, 0, 0, -K/L, -R/L];
    
     
 
     % Calcular las derivadas
     x = [block.ContStates.Data(1); block.ContStates.Data(2); block.ContStates.Data(3); block.ContStates.Data(4); block.ContStates.Data(5)];  % 
     U = block.InputPort(1).Data;  % 
-    B = [0;0;0;0;1];
+    B = [0;0;0;0;1/L];
     dx_dt = A * x + B * U;
     block.Derivatives.Data = dx_dt;
 end

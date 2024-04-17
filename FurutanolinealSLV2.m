@@ -79,55 +79,40 @@ function Derivative(block)
     K = 1.32;
     R = 9.3;
     L = 43.1;
-    
-
-  % Entradas
-
- 
-
-  % Ecuaciones de U
- 
   
- 
-  % Matriz U
-  
-    
-  % Estados
-  
-    U = [K*block.ContStates.Data(5);0];
+
   
 
   % Matriz Qp
-  Qp = [block.ContStates.Data(3); block.ContStates.Data(4)];
+  Qp = [block.ContStates.Data(4); block.ContStates.Data(3)];
 
   % Matriz M(theta)
-  Mtheta1_1 = J + M_2 * (l_bi)^2 + 2 * M_2 * l_bi * C_x + I_z + I_x * sind(block.ContStates.Data(1)) * sin(block.ContStates.Data(1));
-  Mtheta2_1 = M_2 * l_bi * C_z * cosd(block.ContStates.Data(1));
-  Mtheta1_2 = M_2 * l_bi * C_z * cosd(block.ContStates.Data(1));
-  Mtheta2_2 = I_x;
-  M = [Mtheta1_1, Mtheta2_1; Mtheta1_2, Mtheta2_2];
+  M = [M_2*l_bi^2 + 2*C_x*M_2*l_bi + I_x*sin(block.ContStates.Data(1))^2 + I_z + J, C_z*M_2*l_bi*cos(block.ContStates.Data(1)); C_z*M_2*l_bi*cos(block.ContStates.Data(1)), I_x];
+  
 
   % Matriz D(theta, Phi)
-  DthetaPhi1_1 = 2 * I_x * block.ContStates.Data(3) * sind(block.ContStates.Data(1)) * cosd(block.ContStates.Data(1));
-  DthetaPhi1_2 = -block.ContStates.Data(4) * I_x * cosd(block.ContStates.Data(1)) * sind(block.ContStates.Data(1));
-  DthetaPhi2_1 = M_2 * l_bi * C_z * sind(block.ContStates.Data(1)) * block.ContStates.Data(3);
-  DthetaPhi2_2 = 0;
-  D = [DthetaPhi1_1, DthetaPhi2_1; DthetaPhi1_2, DthetaPhi2_2];
+   D=[2*I_x*block.ContStates.Data(1)*cos(block.ContStates.Data(1))*sin(block.ContStates.Data(1)), -C_z*M_2*block.ContStates.Data(1)*l_bi*sin(block.ContStates.Data(1)); -I_x*block.ContStates.Data(4)*cos(block.ContStates.Data(1))*sin(block.ContStates.Data(1)), 0];
 
   % Matriz F(theta)
-  Ftheta1_1 = 0;
-  Ftheta1_2 = M_2 * g * C_z * sind(block.ContStates.Data(1));
-  F = [Ftheta1_1; Ftheta1_2];
+ 
+  F = [0; C_z*M_2*g*sin(block.ContStates.Data(1))];
+
+   %Matriz U
+   U = block.InputPort(1).Data;
+    
+
+   %ksup
+    ksup= M\(U -D*Qp -F);
   %Cálculo de corriente
-  di = (block.InputPort(1).Data - R*block.ContStates.Data(5) - K*block.ContStates.Data(3))/L;
+  di = (block.InputPort(1).Data - R*block.ContStates.Data(5) - K*block.ContStates.Data(4))/L;
   % Derivadas
-  dx = [block.ContStates.Data(3); block.ContStates.Data(4); M\(U - D * Qp - F);di];
+  dx = [block.ContStates.Data(3); block.ContStates.Data(4); ksup(2);ksup(1);di];
   
 
   % Asignar derivadas al bloque
   block.Derivatives.Data(1) = dx(1);
   block.Derivatives.Data(2) = dx(2);
-  block.Derivatives.Data(3) = dx(4);
-  block.Derivatives.Data(4) = dx(3);
+  block.Derivatives.Data(3) = dx(3);
+  block.Derivatives.Data(4) = dx(4);
   block.Derivatives.Data(5) = dx(5);
 end
