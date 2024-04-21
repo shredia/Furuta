@@ -51,20 +51,20 @@ end
 
 function InitConditions(block)
     
-    block.ContStates.Data(1) = pi;  % Theta
-    block.ContStates.Data(2) = 0;   % Phi
-    block.ContStates.Data(3) = 0;   %dTheta
-    block.ContStates.Data(4) = 0;   %dPhi
+    block.ContStates.Data(1) = 0;  % Phi
+    block.ContStates.Data(2) = pi;   % Theta
+    block.ContStates.Data(3) = 0;   %dPhi
+    block.ContStates.Data(4) = 0;   %dTheta
     block.ContStates.Data(5) = 0;   %Corriente
 end
 
 
 
 function Output(block)
-    block.OutputPort(1).Data = block.ContStates.Data(1); %Theta
-    block.OutputPort(2).Data = block.ContStates.Data(2); %Phi
-    block.OutputPort(3).Data = block.ContStates.Data(3); %dTheta
-    block.OutputPort(4).Data = block.ContStates.Data(4); %dPhi
+    block.OutputPort(1).Data = block.ContStates.Data(1); %Phi
+    block.OutputPort(2).Data = block.ContStates.Data(2); %Theta
+    block.OutputPort(3).Data = block.ContStates.Data(3); %dPhi
+    block.OutputPort(4).Data = block.ContStates.Data(4); %dTheta
     block.OutputPort(4).Data = block.ContStates.Data(5); %Corriente
 
     

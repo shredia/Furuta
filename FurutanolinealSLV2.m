@@ -48,18 +48,18 @@ end
 
 function InitConditions(block)
     
-    block.ContStates.Data(1) = pi;  % Theta
-    block.ContStates.Data(2) = 0;   % Phi
-    block.ContStates.Data(3) = 0;   %dTheta
-    block.ContStates.Data(4) = 0;   %dPhi
+    block.ContStates.Data(1) = 0;  % Phi
+    block.ContStates.Data(2) = pi;   % Theta
+    block.ContStates.Data(3) = 0;   %dPhi
+    block.ContStates.Data(4) = 0;   %dTheta
     block.ContStates.Data(5) = 0;   %Corriente
 end
 
 function Output(block)
-    block.OutputPort(1).Data = block.ContStates.Data(1); %Theta
-    block.OutputPort(2).Data = block.ContStates.Data(2); %Phi
-    block.OutputPort(3).Data = block.ContStates.Data(3); %dTheta
-    block.OutputPort(4).Data = block.ContStates.Data(4); %dPhi
+    block.OutputPort(1).Data = block.ContStates.Data(1); %Phi
+    block.OutputPort(2).Data = block.ContStates.Data(2); %Theta
+    block.OutputPort(3).Data = block.ContStates.Data(3); %dPhi
+    block.OutputPort(4).Data = block.ContStates.Data(4); %dTheta
     block.OutputPort(4).Data = block.ContStates.Data(5); %Corriente
 
     
@@ -83,35 +83,34 @@ function Derivative(block)
   
 
   % Matriz Qp
-  Qp = [block.ContStates.Data(4); block.ContStates.Data(3)];
+  Qp = [block.ContStates.Data(3); block.ContStates.Data(4)];
 
   % Matriz M(theta)
-  M = [M_2*l_bi^2 + 2*C_x*M_2*l_bi + I_x*sin(block.ContStates.Data(1))^2 + I_z + J, C_z*M_2*l_bi*cos(block.ContStates.Data(1)); C_z*M_2*l_bi*cos(block.ContStates.Data(1)), I_x];
+  M = [M_2*l_bi^2 + 2*C_x*M_2*l_bi + I_x*sin(block.ContStates.Data(2))^2 + I_z + J, C_z*M_2*l_bi*cos(block.ContStates.Data(2)); C_z*M_2*l_bi*cos(block.ContStates.Data(2)), I_x];
   
 
   % Matriz D(theta, Phi)
-   D=[2*I_x*block.ContStates.Data(1)*cos(block.ContStates.Data(1))*sin(block.ContStates.Data(1)), -C_z*M_2*block.ContStates.Data(1)*l_bi*sin(block.ContStates.Data(1)); -I_x*block.ContStates.Data(4)*cos(block.ContStates.Data(1))*sin(block.ContStates.Data(1)), 0];
+   D=[2*I_x*block.ContStates.Data(4)*cos(block.ContStates.Data(2))*sin(block.ContStates.Data(2)), -C_z*M_2*block.ContStates.Data(4)*l_bi*sin(block.ContStates.Data(2)); -I_x*block.ContStates.Data(3)*cos(block.ContStates.Data(2))*sin(block.ContStates.Data(2)), 0];
 
   % Matriz F(theta)
  
-  F = [0; C_z*M_2*g*sin(block.ContStates.Data(1))];
+  F = [0; C_z*M_2*g*sin(block.ContStates.Data(2))];
 
    %Matriz U
    U = block.InputPort(1).Data;
     
-
-   %ksup
+    
+   %ksup ksu(1) = d2phi ksu(2) = d2theta
     ksup= M\(U -D*Qp -F);
-  %Cálculo de corriente
-  di = (block.InputPort(1).Data - R*block.ContStates.Data(5) - K*block.ContStates.Data(4))/L;
-  % Derivadas
-  dx = [block.ContStates.Data(3); block.ContStates.Data(4); ksup(2);ksup(1);di];
+  %Cálculo de corriente [di = v-R*i-k*dPhi/L
+  di = (block.InputPort(1).Data - R*block.ContStates.Data(5) - K*block.ContStates.Data(3))/L;
+
+
+  % Derivadas [dPhi,dTheta,d2Phi,d2Theta,di]
+  dx = [block.ContStates.Data(3); block.ContStates.Data(4); ksup(1);ksup(2);di];
   
 
   % Asignar derivadas al bloque
-  block.Derivatives.Data(1) = dx(1);
-  block.Derivatives.Data(2) = dx(2);
-  block.Derivatives.Data(3) = dx(3);
-  block.Derivatives.Data(4) = dx(4);
-  block.Derivatives.Data(5) = dx(5);
+  block.Derivatives.Data = dx;
+
 end
