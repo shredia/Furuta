@@ -82,7 +82,7 @@ function Derivative(block)
 
     % Entradas
     
-    A = [0, 0, 1, 0, 0; 0, 0, 0, 1, 0; (C_z*M_2^2*g*l_bi^2 + C_z*I_z*M_2*g + C_z*J*M_2*g + 2*C_x*C_z*M_2^2*g*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J), 0, 0, 0, (C_z*K*M_2*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J); (C_z^2*M_2^2*g*l_bi)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J), 0, 0, 0, (I_x*K)/(- C_z^2*M_2^2*l_bi^2 + I_x*M_2*l_bi^2 + 2*C_x*I_x*M_2*l_bi + I_x*I_z + I_x*J); 0, 0, 0, -K/L, -R/L];
+    A = [0,0,1.0000,0,0;0,0,0,1.0000,0;-0.0197,0,0,0,-0.0000; 0 ,0,-0.0306, 0, -0.2158;0.0387,0,0,0,0.3519];
    
     
 
