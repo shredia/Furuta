@@ -41,8 +41,9 @@ function setup(block)
 
   %% Registrar métodos
   block.RegBlockMethod('InitializeConditions', @InitConditions);
-  block.RegBlockMethod('Outputs',                 @Output);  
-  block.RegBlockMethod('Derivatives',             @Derivative);  
+   
+  block.RegBlockMethod('Derivatives',             @Derivative); 
+   block.RegBlockMethod('Outputs',                 @Output);
 
 end
 
@@ -55,15 +56,6 @@ function InitConditions(block)
     block.ContStates.Data(5) = 0;   %Corriente
 end
 
-function Output(block)
-    block.OutputPort(1).Data = block.ContStates.Data(1); %Phi
-    block.OutputPort(2).Data = block.ContStates.Data(2); %Theta
-    block.OutputPort(3).Data = block.ContStates.Data(3); %dPhi
-    block.OutputPort(4).Data = block.ContStates.Data(4); %dTheta
-    block.OutputPort(4).Data = block.ContStates.Data(5); %Corriente
-
-    
-end
 function Derivative(block)
  % Definición de constantes
     g = 9.81;       % Valor de la gravedad
@@ -82,10 +74,10 @@ function Derivative(block)
 
   
 
-  % Matriz Qp
+  % Matriz Qp [dPhi,dTheta]
   Qp = [block.ContStates.Data(3); block.ContStates.Data(4)];
 
-  % Matriz M(theta)
+  % Matriz M(theta) 
   M = [M_2*l_bi^2 + 2*C_x*M_2*l_bi + I_x*sin(block.ContStates.Data(2))^2 + I_z + J, C_z*M_2*l_bi*cos(block.ContStates.Data(2)); C_z*M_2*l_bi*cos(block.ContStates.Data(2)), I_x];
   
 
@@ -113,4 +105,14 @@ function Derivative(block)
   % Asignar derivadas al bloque
   block.Derivatives.Data = dx;
 
+end
+
+function Output(block)
+    block.OutputPort(1).Data = block.ContStates.Data(1); %Phi
+    block.OutputPort(2).Data = block.ContStates.Data(2); %Theta
+    block.OutputPort(3).Data = block.ContStates.Data(3); %dPhi
+    block.OutputPort(4).Data = block.ContStates.Data(4); %dTheta
+    block.OutputPort(4).Data = block.ContStates.Data(5); %Corriente
+
+    
 end

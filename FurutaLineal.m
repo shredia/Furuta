@@ -82,14 +82,22 @@ function Derivative(block)
 
     % Entradas
     
-    A = [0,0,1.0000,0,0;0,0,0,1.0000,0;-0.0197,0,0,0,-0.0000; 0 ,0,-0.0306, 0, -0.2158;0.0387,0,0,0,0.3519];
-   
+    
+    A = [0	0	1.00000000000000	0	0;
+0	0	0	1.00000000000000	0;
+0	-1.12784590916698	0	0	0;
+0	-2.21925984550972	0	0	0;
+0	0	-0.0306264501160093	0	-0.215777262180974];
     
 
     % Calcular las derivadas
     x = [block.ContStates.Data(1); block.ContStates.Data(2); block.ContStates.Data(3); block.ContStates.Data(4); block.ContStates.Data(5)];  % 
     U = block.InputPort(1).Data;  % 
-    B = [0;0;0;0;1/L];
+    B = [0;
+0;
+-0.266656901112579;
+-0.791264486955069;
+0.0232018561484919];
     dx_dt = A * x + B * U;
     block.Derivatives.Data = dx_dt;
 end
