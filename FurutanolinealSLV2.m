@@ -86,7 +86,7 @@ function Derivative(block)
 
   % Matriz F(theta)
  
-  F = [0; C_z*M_2*g*sin(block.ContStates.Data(2))];
+  F = [0; -C_z*M_2*g*sin(block.ContStates.Data(2))];
 
    %Matriz U
    U = block.InputPort(1).Data;
