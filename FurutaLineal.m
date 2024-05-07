@@ -11,7 +11,7 @@ function setup(block)
 
     %% Register number of input and output ports
     block.NumInputPorts  = 1;
-    block.NumOutputPorts = 5;
+    block.NumOutputPorts = 7;
 
     %% Setup functional port properties to dynamically
     %% inherited.
@@ -29,6 +29,8 @@ function setup(block)
     block.OutputPort(3).Dimensions       = 1;
     block.OutputPort(4).Dimensions       = 1;
     block.OutputPort(5).Dimensions       = 1;
+    block.OutputPort(6).Dimensions       = [5,5];
+    block.OutputPort(7).Dimensions       = [5,1];
     
 
     %% Set block sample time to continuous
@@ -65,7 +67,8 @@ function Output(block)
     block.OutputPort(2).Data = block.ContStates.Data(2); %Theta
     block.OutputPort(3).Data = block.ContStates.Data(3); %dPhi
     block.OutputPort(4).Data = block.ContStates.Data(4); %dTheta
-    block.OutputPort(4).Data = block.ContStates.Data(5); %Corriente
+    block.OutputPort(5).Data = block.ContStates.Data(5); %Corriente
+   
 
     
 end
@@ -74,11 +77,11 @@ function Derivative(block)
     % Definición de constantes
  
     
-    A =[0,	0,	                1.00000000000000,	0,	                0;
-        0,	0,	                0,	                1.00000000000000,	0;
-        0,	1.12739384026080,	0,	                0,	                40.2331581464512;
-        0,	-97.3203986840389,	0,	                0,	                -34.3809291109164;
-        0,	0,	                -15.3571428571429,	0,	                -144.761904761905];
+    A =[0,	0,	                1.00000000000000,	    0,	                0;
+        0,	0,	                0,	                    1.00000000000000,	0;
+        0,	1.127393840260797,	0,	                    0,	                40.233158146451224;
+        0,	97.320398684038890,	0,	                    0,	                34.380929110916400;
+        0,	0,	                -15.357142857142856,	0,	                -144.7619047619047];
     
 
     % Calcular las derivadas
@@ -89,9 +92,11 @@ function Derivative(block)
          0;
          0;
          0;
-         11.9047619047619];
+         11.904761904761903];
 
     dx_dt = A*x+B*U;
+     block.OutputPort(6).Data = A;
+    block.OutputPort(7).Data = B;
 
     block.Derivatives.Data = dx_dt;
 end
