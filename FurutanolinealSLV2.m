@@ -41,9 +41,9 @@ function setup(block)
 
   %% Registrar métodos
   block.RegBlockMethod('InitializeConditions', @InitConditions);
-   
+  block.RegBlockMethod('Outputs',                 @Output);
   block.RegBlockMethod('Derivatives',             @Derivative); 
-   block.RegBlockMethod('Outputs',                 @Output);
+   
 
 end
 
@@ -62,9 +62,9 @@ function Derivative(block)
            
     J = 0.0321;     % Valor de J
     M_2 = 98/1000;       % Valor de M_2
-    l_bi = 8.7;     % Valor de l_bi
+    l_bi = 8.7/100;     % Valor de l_bi
     C_x = -4/100;     % Valor de C_x
-    C_z = 4.4;      % Valor de C_z
+    C_z = 4.4/100;      % Valor de C_z
     I_x = 4.39e-4;  % Valor de I_x
     I_z = 1.88e-4;  % Valor de I_z
     K = 1.32;
