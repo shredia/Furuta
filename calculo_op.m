@@ -8,13 +8,14 @@ xf = [3,5];
 uf = [];
 yf = [];
 
-[x_op,u_op,y_op] = trim("trim_simulation",x0,u0,y0,xf,uf,yf)
+[x_op,u_op,y_op] = trim("trim_simulation",x0,u0,y0,xf,uf,yf);
 
 [A,B,C,D] = linmod("trim_simulation",x_op,u_op);
 
 sys=ss(A,B,C,D);
 
-polos_punto_0=eig(A);
+polos_punto_0=eig(A)
+pzmap(sys)
 %%
 %%punto de operacion Theta=pi
 x1 = [0;pi;0;0;0];
@@ -25,13 +26,14 @@ xf1 = [3,5];
 uf1 = [];
 yf1 = [];
 
-[x_pi,u_pi,y_pi] = trim("trim_simulation",x1,u1,y1,xf1,uf1,yf1)
+[x_pi,u_pi,y_pi] = trim("trim_simulation",x1,u1,y1,xf1,uf1,yf1);
 
 [A1,B1,C1,D1] = linmod("trim_simulation",x_pi,u_pi);
 
 sys1=ss(A1,B1,C1,D1);
 
-polos_punto_pi=eig(A1);
+polos_punto_pi=eig(A1)
+pzmap(sys1);
 
 
 %%
@@ -64,9 +66,9 @@ Ct=C1-D1*Kc;
 Dt=zeros(size(D1));
 %%
 %%polos rebicados
-eig(At)
+eig(At);
 H1=ss(At,Bt,Ct,Dt);
-pzmap(H1)
+pzmap(H1);
 
 %la pregunta es como agregar el K al tema que me interesa
 
