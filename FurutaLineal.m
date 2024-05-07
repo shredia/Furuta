@@ -72,32 +72,26 @@ end
 
 function Derivative(block)
     % Definición de constantes
-
-    K = 1.32;
-    R = 9.3;
-    L = 43.1;
+ 
     
-
-
-
-    % Entradas
-    
-    
-    A = [0	0	1.00000000000000	0	0;
-0	0	0	1.00000000000000	0;
-0	-1.12784590916698	0	0	0;
-0	-2.21925984550972	0	0	0;
-0	0	-0.0306264501160093	0	-0.215777262180974];
+    A =[0,	0,	                1.00000000000000,	0,	                0;
+        0,	0,	                0,	                1.00000000000000,	0;
+        0,	1.12739384026080,	0,	                0,	                40.2331581464512;
+        0,	-97.3203986840389,	0,	                0,	                -34.3809291109164;
+        0,	0,	                -15.3571428571429,	0,	                -144.761904761905];
     
 
     % Calcular las derivadas
     x = [block.ContStates.Data(1); block.ContStates.Data(2); block.ContStates.Data(3); block.ContStates.Data(4); block.ContStates.Data(5)];  % 
     U = block.InputPort(1).Data;  % 
+    
     B = [0;
-0;
--0.266656901112579;
--0.791264486955069;
-0.0232018561484919];
-    dx_dt = A * x + B * U;
+         0;
+         0;
+         0;
+         11.9047619047619];
+
+    dx_dt = A*x+B*U;
+
     block.Derivatives.Data = dx_dt;
 end

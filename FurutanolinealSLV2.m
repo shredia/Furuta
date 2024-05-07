@@ -41,9 +41,9 @@ function setup(block)
 
   %% Registrar métodos
   block.RegBlockMethod('InitializeConditions', @InitConditions);
-   
+  block.RegBlockMethod('Outputs',                 @Output);
   block.RegBlockMethod('Derivatives',             @Derivative); 
-   block.RegBlockMethod('Outputs',                 @Output);
+   
 
 end
 
@@ -62,14 +62,14 @@ function Derivative(block)
            
     J = 0.0321;     % Valor de J
     M_2 = 98/1000;       % Valor de M_2
-    l_bi = 8.7;     % Valor de l_bi
+    l_bi = 8.7/100;     % Valor de l_bi
     C_x = -4/100;     % Valor de C_x
-    C_z = 4.4;      % Valor de C_z
+    C_z = 4.4/100;      % Valor de C_z
     I_x = 4.39e-4;  % Valor de I_x
-    I_z = 1.88e-4;  % Valor de I_z
-    K = 1.32;
-    R = 9.3;
-    L = 43.1;
+    I_z = 2.24e-4;  % Valor de I_z
+    K = 1.29;
+    R = 12.16;
+    L = 84e-3;
   
 
   
@@ -78,18 +78,18 @@ function Derivative(block)
   Qp = [block.ContStates.Data(3); block.ContStates.Data(4)];
 
   % Matriz M(theta) 
-  M = [M_2*l_bi^2 + 2*C_x*M_2*l_bi + I_x*sin(block.ContStates.Data(2))^2 + I_z + J, C_z*M_2*l_bi*cos(block.ContStates.Data(2)); C_z*M_2*l_bi*cos(block.ContStates.Data(2)), I_x];
+  M = [M_2*l_bi^2 + 2*C_x*M_2*l_bi + I_x*sin(block.ContStates.Data(2))*sin(block.ContStates.Data(2))+ I_z + J, C_z*M_2*l_bi*cos(block.ContStates.Data(2)); C_z*M_2*l_bi*cos(block.ContStates.Data(2)), I_x];
   
 
   % Matriz D(theta, Phi)
-   D=[2*I_x*block.ContStates.Data(4)*cos(block.ContStates.Data(2))*sin(block.ContStates.Data(2)), -C_z*M_2*block.ContStates.Data(4)*l_bi*sin(block.ContStates.Data(2)); -I_x*block.ContStates.Data(3)*cos(block.ContStates.Data(2))*sin(block.ContStates.Data(2)), 0];
+   D=[2*I_x*block.ContStates.Data(4)*cos(block.ContStates.Data(2))*sin(block.ContStates.Data(2)), -C_z*M_2*l_bi*sin(block.ContStates.Data(2))*block.ContStates.Data(4); -I_x*block.ContStates.Data(3)*cos(block.ContStates.Data(2))*sin(block.ContStates.Data(2)), 0];
 
   % Matriz F(theta)
  
   F = [0; C_z*M_2*g*sin(block.ContStates.Data(2))];
 
    %Matriz U
-   U = block.InputPort(1).Data;
+   U = [K*block.ContStates.Data(5);0];
     
     
    %ksup ksu(1) = d2phi ksu(2) = d2theta
