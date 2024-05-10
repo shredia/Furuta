@@ -11,7 +11,7 @@ function setup(block)
 
     %% Register number of input and output ports
     block.NumInputPorts  = 1;
-    block.NumOutputPorts = 7;
+    block.NumOutputPorts = 1;
 
     %% Setup functional port properties to dynamically
     %% inherited.
@@ -24,13 +24,9 @@ function setup(block)
     
 
 
-    block.OutputPort(1).Dimensions       = 1;
-    block.OutputPort(2).Dimensions       = 1;
-    block.OutputPort(3).Dimensions       = 1;
-    block.OutputPort(4).Dimensions       = 1;
-    block.OutputPort(5).Dimensions       = 1;
-    block.OutputPort(6).Dimensions       = [5,5];
-    block.OutputPort(7).Dimensions       = [5,1];
+    block.OutputPort(1).Dimensions       = [5,1];
+    
+  
     
 
     %% Set block sample time to continuous
@@ -54,7 +50,7 @@ end
 function InitConditions(block)
     
     block.ContStates.Data(1) = 0;  % Phi
-    block.ContStates.Data(2) = 0;   % Theta
+    block.ContStates.Data(2) = pi;   % Theta
     block.ContStates.Data(3) = 0;   %dPhi
     block.ContStates.Data(4) = 0;   %dTheta
     block.ContStates.Data(5) = 0;   %Corriente
@@ -63,11 +59,9 @@ end
 
 
 function Output(block)
-    block.OutputPort(1).Data = block.ContStates.Data(1); %Phi
-    block.OutputPort(2).Data = block.ContStates.Data(2); %Theta
-    block.OutputPort(3).Data = block.ContStates.Data(3); %dPhi
-    block.OutputPort(4).Data = block.ContStates.Data(4); %dTheta
-    block.OutputPort(5).Data = block.ContStates.Data(5); %Corriente
+    block.OutputPort(1).Data = block.ContStates.Data; %Salida de estados
+  
+    
    
 
     
@@ -95,8 +89,7 @@ function Derivative(block)
          11.904761904761903];
 
     dx_dt = A*x+B*U;
-     block.OutputPort(6).Data = A;
-    block.OutputPort(7).Data = B;
+     
 
     block.Derivatives.Data = dx_dt;
 end

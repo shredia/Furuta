@@ -14,21 +14,18 @@ function setup(block)
 
   %% Registrar el número de puertos de entrada y salida
   block.NumInputPorts  = 1;
-  block.NumOutputPorts = 5;
+  block.NumOutputPorts = 1;
 
   %% Configurar propiedades de puerto funcional para heredar dinámicamente
   block.SetPreCompInpPortInfoToDynamic;
   block.SetPreCompOutPortInfoToDynamic;
 
-  block.InputPort(1).Dimensions        = 1;
+  block.InputPort(1).Dimensions        = [5,1];
   block.InputPort(1).DirectFeedthrough = false;
 
   
-  block.OutputPort(1).Dimensions       = 1;
-   block.OutputPort(2).Dimensions       = 1;
-    block.OutputPort(3).Dimensions       = 1;
-     block.OutputPort(4).Dimensions       = 1;
-     block.OutputPort(5).Dimensions       = 1;
+  block.OutputPort(1).Dimensions       = [5,1];
+   
   
   %% Establecer el tiempo de muestreo del bloque a continuo
   block.SampleTimes = [0 0];
@@ -108,11 +105,8 @@ function Derivative(block)
 end
 
 function Output(block)
-    block.OutputPort(1).Data = block.ContStates.Data(1); %Phi
-    block.OutputPort(2).Data = block.ContStates.Data(2); %Theta
-    block.OutputPort(3).Data = block.ContStates.Data(3); %dPhi
-    block.OutputPort(4).Data = block.ContStates.Data(4); %dTheta
-    block.OutputPort(5).Data = block.ContStates.Data(5); %Corriente
-
+    %%block.OutputPort(1).Data = [block.ContStates.Data(2);block.ContStates.Data(5)]; %Phi
     
+block.OutputPort(1).Data = block.ContStates.Data;
+        
 end
