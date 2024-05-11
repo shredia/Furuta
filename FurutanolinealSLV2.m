@@ -20,11 +20,11 @@ function setup(block)
   block.SetPreCompInpPortInfoToDynamic;
   block.SetPreCompOutPortInfoToDynamic;
 
-  block.InputPort(1).Dimensions        = [5,1];
+  block.InputPort(1).Dimensions        = [1,1];
   block.InputPort(1).DirectFeedthrough = false;
 
   
-  block.OutputPort(1).Dimensions       = [5,1];
+  block.OutputPort(1).Dimensions       = [2,1];
    
   
   %% Establecer el tiempo de muestreo del bloque a continuo
@@ -105,8 +105,8 @@ function Derivative(block)
 end
 
 function Output(block)
-    %%block.OutputPort(1).Data = [block.ContStates.Data(2);block.ContStates.Data(5)]; %Phi
+    block.OutputPort(1).Data = [block.ContStates.Data(2);block.ContStates.Data(5)]; %Phi
     
-block.OutputPort(1).Data = block.ContStates.Data;
+
         
 end
