@@ -24,8 +24,10 @@ function setup(block)
   block.InputPort(1).DirectFeedthrough = false;
 
   
-  block.OutputPort(1).Dimensions       = [2,1];
-   
+  block.OutputPort(1).Dimensions       = [3,1];
+ 
+  
+ 
   
   %% Establecer el tiempo de muestreo del bloque a continuo
   block.SampleTimes = [0 0];
@@ -105,8 +107,12 @@ function Derivative(block)
 end
 
 function Output(block)
-    block.OutputPort(1).Data = [block.ContStates.Data(2);block.ContStates.Data(5)]; %Phi
-    
+    block.OutputPort(1).Data = [block.ContStates.Data(1);block.ContStates.Data(2);block.ContStates.Data(5)]; %Phi
+    % 
+    % block.OutputPort(1).Data = block.ContStates.Data(1);
+    % block.OutputPort(2).Data = block.ContStates.Data(2);
+    % 
+    % block.OutputPort(3).Data = block.ContStates.Data(5);
 
         
 end

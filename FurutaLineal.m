@@ -24,7 +24,7 @@ function setup(block)
     
 
 
-    block.OutputPort(1).Dimensions       = [5,1];
+    block.OutputPort(1).Dimensions       = [3,1];
     
   
     
@@ -59,7 +59,7 @@ end
 
 
 function Output(block)
-    block.OutputPort(1).Data = block.ContStates.Data; %Salida de estados
+    block.OutputPort(1).Data = [block.ContStates.Data(1);block.ContStates.Data(2);block.ContStates.Data(5)]; %Salida de estados
   
     
    
