@@ -11,7 +11,7 @@ function setup(block)
 
     %% Register number of input and output ports
     block.NumInputPorts  = 1;
-    block.NumOutputPorts = 1;
+    block.NumOutputPorts = 5;
 
     %% Setup functional port properties to dynamically
     %% inherited.
@@ -24,7 +24,11 @@ function setup(block)
     
 
 
-    block.OutputPort(1).Dimensions       = [3,1];
+    block.OutputPort(1).Dimensions       = 1;
+    block.OutputPort(2).Dimensions       = 1;
+    block.OutputPort(3).Dimensions       = 1;
+    block.OutputPort(4).Dimensions       = 1;
+    block.OutputPort(5).Dimensions       = 1;
     
   
     
@@ -59,8 +63,11 @@ end
 
 
 function Output(block)
-    block.OutputPort(1).Data = [block.ContStates.Data(1);block.ContStates.Data(2);block.ContStates.Data(5)]; %Salida de estados
-  
+    block.OutputPort(1).Data =  block.ContStates.Data(1);  % Phi
+    block.OutputPort(1).Data =  block.ContStates.Data(2);   % Theta
+    block.OutputPort(1).Data =  block.ContStates.Data(3);   %dPhi
+    block.OutputPort(1).Data =  block.ContStates.Data(4);   %dTheta
+    block.OutputPort(1).Data =  block.ContStates.Data(5);   %Corriente
     
    
 
