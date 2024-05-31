@@ -24,7 +24,7 @@ function setup(block)
   block.InputPort(1).DirectFeedthrough = false;
 
   
-  block.OutputPort(1).Dimensions       = [5,1];
+  block.OutputPort(1).Dimensions       = [3,1];
   % block.OutputPort(2).Dimensions       = 1;
   % block.OutputPort(3).Dimensions       = 1;
   % block.OutputPort(4).Dimensions       = 1;
@@ -111,7 +111,7 @@ end
 
 function Output(block)
 
-    block.OutputPort(1).Data = [block.ContStates.Data(1);block.ContStates.Data(2);block.ContStates.Data(3);block.ContStates.Data(4);block.ContStates.Data(5);];
+    block.OutputPort(1).Data = [block.ContStates.Data(1);block.ContStates.Data(2);block.ContStates.Data(5);];
     % block.OutputPort(2).Data = block.ContStates.Data(2);
     % block.OutputPort(3).Data = block.ContStates.Data(3);
     % block.OutputPort(4).Data = block.ContStates.Data(4);
