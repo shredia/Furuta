@@ -1,0 +1,168 @@
+ %%punto de operacion Theta=0
+x0 = [0;0;0;0;0];
+u0 = [0];
+y0 = [0;0;0;0;0];
+
+xf = [2,5];
+uf = [];
+yf = [];
+
+[x_op,u_op,y_op] = trim("trim_simulation",x0,u0,y0,xf,uf,yf);
+
+[A,B,C,D] = linmod("trim_simulation",x_op,u_op);
+
+sys=ss(A,B,C,D);
+obs_0 = rank(obsv(A,C))
+controlabilidad_0 = rank(ctrb(A,B))
+polos_punto_0=eig(A);
+
+%%punto de operacion Theta=pi
+x1 = [0;pi;0;0;0];
+u1 = [0];
+y1 = [0;0;0;0;0];
+
+xf1 = [2,5];
+uf1 = [];
+yf1 = [];
+
+[x_pi,u_pi,y_pi] = trim("trim_simulation",x1,u1,y1,xf1,uf1,yf1);
+
+[A1,B1,C1,D1] = linmod("trim_simulation",x_pi,u_pi);
+
+sys1=ss(A1,B1,C1,D1);
+obs_pi = rank(obsv(A1,C1))
+controlabilidad_pi = rank(ctrb(A1,B1))
+polos_punto_pi=eig(A1);
+Control LQR lin1
+
+Q=[0.0001,0,0,0,0;0,1,0,0,0;0,0,1,0,0;0,0,0,1,0;0,0,0,0,1];
+
+R=90;
+
+
+[K,S,P] = lqr(A,B,Q,R)
+Control LQR lin2
+Q1=[10,0,0,0,0;0,1,0,0,0;0,0,1,0,0;0,0,0,1,0;0,0,0,0,1];
+
+R1=90;
+
+
+[K1,S1,P1] = lqr(A1,B1,Q1,R1)
+Ruido
+
+fmax=min(real(P))
+tc=(1/100)*(2*pi/fmax)
+
+fmax1=min(real(P1))
+tc1=(1/100)*(2*pi/fmax1)
+%para el ruido de medicion
+amp1=0.1;%amplitud tuid phi
+amp2=0.1;%amplitud ruido theta
+amp3=0.1;%amplitud ruido corriente
+ruidomed=(tc*[amp1;amp2;amp3]).^2
+ruidomed1=(tc1*[amp1;amp2;amp3]).^2
+
+%para el ruido de proceso
+ampp1=0.2;%esto dependera de la capacidad del motor en V?
+ruidopros=(tc*ampp1).^2
+ruidopros1=(tc1*ampp1).^2
+
+%   al agregar el ruido, de la forma mas "facil", se hace un nuevo sistema
+%   tal que la entrada admita una nueva entrada que sera la misma variable, es
+%   decir, para nuestro caso, agregamos un B adicional al sistema que lo que
+%   hara sera meter el ruido de voltaje de entrada 
+%   dx=Ax+[B B][u(volatjedeentrada);w(ruidodeentradaenV]
+Kalman
+ G=ss(A,[B B], C,[D D]);
+ Qkalman=[10;10];%esto me parece que va a asociado a la entrada 
+ Rkalman=[5;5;5];% y esto me parece que va asociado a las salidas
+ [L,Theta,P]=kalman(G,diag(Qkalman),diag(Rkalman))
+Kalman1
+ G1=ss(A1,[B1 B1], C1,[D1 D1]);
+ Qkalman1=[10;10];%esto me parece que va a asociado a la entrada 
+ Rkalman1=[5;5;5];% y esto me parece que va asociado a las salidas
+ 
+[L1,Theta1,P1]=kalman(G1,diag(Qkalman1),diag(Rkalman1));
+Control LQI lin0 (con referencia)
+% 
+
+ Clqi=[1,0,0,0,0];
+ Dlqi=0;
+ lqisis=ss(A,B,Clqi,Dlqi)
+ Qi=blkdiag(Q,100);
+ 
+ Ri=50;
+ 
+ [Ki,Si,ei] = lqi(lqisis,Qi,Ri)
+Control LQI lin1 (con referencia)
+ 
+ Clqi1=[1,0,0,0,0];
+ Dlqi1=0;
+ lqisis1=ss(A1,B1,Clqi1,Dlqi1)
+ Qi1=blkdiag(Q1,100);
+ 
+ Ri1=50;
+ 
+ [Ki1,Si1,ei1] = lqi(lqisis1,Qi1,Ri1)
+Reubicacion de polos Controlador
+% 
+% ts=5;     %1 segundo
+% SP=2/100;     %sin sobrepaso
+% Ba=2/100; %2% de banda de asentamiento
+% 
+% Tau=ts/5;
+% chi=abs(log(SP))/sqrt(pi^2+log(SP)^2); %factor de asentamiento
+% Wn=log(1/Ba*(sqrt(1-chi^2)))/(ts*chi);%frecuencia natural
+% 
+% den=[1, 2*Wn*chi, Wn^2];
+% r=roots(den)%polos FT segundo orden 
+% 
+% 
+
+Polos controlador
+% polos_controlador1 = [-1/Tau -7/Tau -8/Tau -9/Tau -10/Tau]%polos dominates real (primer orden )
+% polos_controlador2 = [r(1) r(2) 10*real(r(1)) 12*real(r(2)) 15*real(r(1))]% polo dominate complejo conjugado (segundo orden) 
+
+Ubicacion de polos    
+% Kc1=place(A1,B1,polos_controlador1);
+% At1=A1-B1*Kc1;
+% Bt1=zeros(size(B1));
+% Ct1=C1-D1*Kc1;
+% Dt1=zeros(size(D1));
+% 
+% Kc2=place(A1,B1,polos_controlador2);
+% At2=A1-B1*Kc2;
+% Bt2=zeros(size(B1));
+% Ct2=C1-D1*Kc2;
+% Dt2=zeros(size(D1));
+% 
+Reubicacion de polos Observador
+% ts_o=1;     % más rápido
+% SP_o=2/100;     %sin sobrepaso
+% Ba_o=2/100; %2% de banda de asentamiento
+% 
+% Tau_o=ts_o/5;
+% chi_o=abs(log(SP_o))/sqrt(pi^2+log(SP_o)^2); %factor de asentamiento
+% Wn_o=log(1/Ba_o*(sqrt(1-chi_o^2)))/(ts_o*chi_o);%frecuencia natural
+% 
+% den_o=[1, 2*Wn_o*chi_o, Wn_o^2];
+% r_o=roots(den_o);%polos FT segundo orden
+Polos Observador
+% polos_Observador1=[-1/Tau_o -7/Tau_o -8/Tau_o -9/Tau_o -10/Tau_o]%polos dominates real (primer orden )
+% polos_Observador2=[r_o(1) r_o(2) 10*real(r_o(1)) 12*real(r_o(2)) 15*real(r_o(1))]
+Ubicación de polos
+% 
+% 
+% L1 = place(A1',C1',polos_Observador1);
+% L1_T = L1';
+% A_observador1 = A1-L1_T*C1;
+% B_observador1 = [B1 L1_T];
+% C_observador1 = eye(size(A_observador1));
+% D_observador1 = zeros(size(C_observador1,1),size(B_observador1,2));
+% 
+% 
+% L2 = transpose(place(transpose(A1),transpose(C1),polos_Observador2));
+% A_observador2 = A1-L2*C1;
+% B_observador2 = [B1 L2];
+% C_observador2 = eye(size(A_observador2));
+% D_observador2 = zeros(size(C_observador2,1),size(B_observador2,2));
