@@ -107,7 +107,10 @@ function Derivative(block)
   % % Asignar derivadas al bloque
   % block.Derivatives.Data = dx;
 
-
+  q1 = block.ContStates.Data(1);
+  q2 = block.ContStates.Data(2);
+  q1p = block.ContStates.Data(3);
+  q2p = block.ContStates.Data(4);
   betha = 100;
   tetha1 =  0.0619;
   tetha2 =  0.0149;
@@ -119,41 +122,41 @@ function Derivative(block)
   tetha8 =  0.0188;
   tetha9 =  0.0087;
   
-  M11 = tetha1 + tetha2*sin(block.ContStates.Data(2))^2;
-  M12 = tetha3*cos(block.ContStates.Data(2));
+  M11 = tetha1 + tetha2*sin(q2)^2;
+  M12 = tetha3*cos(q2);
   M21 = M12;
   M22 = tetha4;
 
   M = [M11 M12;M21 M22];
 
-  C11 = 0.5*tetha2*block.ContStates.Data(4)*sin(2*block.ContStates.Data(2));
-  C12 = -tetha3*block.ContStates.Data(4)*sin(block.ContStates.Data(2)) + 0.5*tetha2*block.ContStates.Data(3)*sin(2*block.ContStates.Data(2));
-  C21 = -0.5*tetha2*block.ContStates.Data(3)*sin(2*block.ContStates.Data(2));
+  C11 = 0.5*tetha2*q2p*sin(2*q2);
+  C12 = -tetha3*q2p*sin(q2) + 0.5*tetha2*q1p*sin(2*q2);
+  C21 = -0.5*tetha2*q1p*sin(2*q2);
   C22 = 0;
 
   C = [C11 C12;C21 C22];
   g1 = 0;
-  g2 = -tetha5*sin(block.ContStates.Data(2));
+  g2 = -tetha5*sin(q2);
 
   g = [g1;g2];
 
-  fv1 = tetha6*block.ContStates.Data(3);
-  fv2 = tetha7*block.ContStates.Data(4);
+  fv1 = tetha6*q1p;
+  fv2 = tetha7*q2p;
 
   fv = [fv1;fv2];
 
-  fc1 = tetha8*tanh(betha*block.ContStates.Data(3));
-  fc2 = tetha9*tanh(betha*block.ContStates.Data(4));
+  fc1 = tetha8*tanh(betha*q1p);
+  fc2 = tetha9*tanh(betha*q2p);
   
   fc = [fc1;fc2];
     
-  Qp = [block.ContStates.Data(3); block.ContStates.Data(4)];
+  Qp = [q1p; q2p];
 
   U = [block.InputPort(1).Data;0];
 
   ksup = M\(U - C*Qp - g- fv - fc);
 
-  block.Derivatives.Data = [block.ContStates.Data(3); block.ContStates.Data(4); ksup(1);ksup(2)];
+  block.Derivatives.Data = [q1p; q2p; ksup(1);ksup(2)];
 end
 
 function Output(block)
