@@ -10,7 +10,7 @@ end
 function setup(block)
 
   %% Registrar el número de parámetros de diálogo
-  block.NumDialogPrms = 0;
+  block.NumDialogPrms = 4; % Por ejemplo, cuatro parámetros
 
   %% Registrar el número de puertos de entrada y salida
   block.NumInputPorts  = 1;
@@ -29,6 +29,9 @@ function setup(block)
   block.OutputPort(3).Dimensions       = 1;
   block.OutputPort(4).Dimensions       = 1;
 
+
+  
+    
   % 
  
   
@@ -51,59 +54,106 @@ end
 
 function InitConditions(block)
     
-    block.ContStates.Data(1) = 0;  % Phi
-    block.ContStates.Data(2) = 0;   % Theta
-    block.ContStates.Data(3) = 0;   %dPhi
-    block.ContStates.Data(4) = 0;   %dTheta
+    block.ContStates.Data(1) = block.DialogPrm(1).Data; % Phi q1
+    block.ContStates.Data(2) = block.DialogPrm(2).Data;   % Theta q2
+    block.ContStates.Data(3) = block.DialogPrm(3).Data;  %dPhi
+    block.ContStates.Data(4) = block.DialogPrm(4).Data;   %dTheta
     
 end
 
 function Derivative(block)
  % Definición de constantes
-    g = 9.81;       % Valor de la gravedad
-           
-    J = 0.0321;     % Valor de J
-    M_2 = 98/1000;       % Valor de M_2
-    l_bi = 8.7/100;     % Valor de l_bi
-    C_x = -4/100;     % Valor de C_x
-    C_z = 4.4/100;      % Valor de C_z
-    I_x = 4.39e-4;  % Valor de I_x
-    I_z = 2.24e-4;  % Valor de I_z
-    
-    
+  %   g = 9.81;       % Valor de la gravedad
+  % 
+  %   J = 0.0321;     % Valor de J
+  %   M_2 = 98/1000;       % Valor de M_2
+  %   l_bi = 8.7/100;     % Valor de l_bi
+  %   C_x = -4/100;     % Valor de C_x
+  %   C_z = 4.4/100;      % Valor de C_z
+  %   I_x = 4.39e-4;  % Valor de I_x
+  %   I_z = 2.24e-4;  % Valor de I_z
+  % 
+  % 
+  % 
+  % 
+  % 
+  % % Matriz Qp [dPhi,dTheta]
+  % Qp = [block.ContStates.Data(3); block.ContStates.Data(4)];
+  % 
+  % % Matriz M(theta) 
+  % M = [M_2*l_bi^2 + 2*C_x*M_2*l_bi + I_x*sin(block.ContStates.Data(2))*sin(block.ContStates.Data(2))+ I_z + J, C_z*M_2*l_bi*cos(block.ContStates.Data(2)); C_z*M_2*l_bi*cos(block.ContStates.Data(2)), I_x];
+  % 
+  % 
+  % % Matriz D(theta, Phi)
+  %  D=[2*I_x*block.ContStates.Data(4)*cos(block.ContStates.Data(2))*sin(block.ContStates.Data(2)), -C_z*M_2*l_bi*sin(block.ContStates.Data(2))*block.ContStates.Data(4); -I_x*block.ContStates.Data(3)*cos(block.ContStates.Data(2))*sin(block.ContStates.Data(2)), 0];
+  % 
+  % % Matriz F(theta)
+  % 
+  % F = [0; C_z*M_2*g*sin(block.ContStates.Data(2))];
+  % 
+  %  %Matriz U
+  %  U = [block.InputPort(1).Data;0];
+  % 
+  % 
+  %  %ksup ksu(1) = d2phi ksu(2) = d2theta
+  %   ksup= M\(U -D*Qp -F);
+  % 
+  % 
+  % 
+  % % Derivadas [dPhi,dTheta,d2Phi,d2Theta,di]
+  % dx = [block.ContStates.Data(3); block.ContStates.Data(4); ksup(1);ksup(2)];
+  % 
+  % 
+  % % Asignar derivadas al bloque
+  % block.Derivatives.Data = dx;
 
+
+  betha = 100;
+  tetha1 =  0.0619;
+  tetha2 =  0.0149;
+  tetha3 =  0.0185;
+  tetha4 =  0.0131;
+  tetha5 =  0.5076;
+  tetha6 =  0.0083;
+  tetha7 =  0.0007;
+  tetha8 =  0.0188;
+  tetha9 =  0.0087;
   
+  M11 = tetha1 + tetha2*sin(block.ContStates.Data(2))^2;
+  M12 = tetha3*cos(block.ContStates.Data(2));
+  M21 = M12;
+  M22 = tetha4;
 
-  % Matriz Qp [dPhi,dTheta]
+  M = [M11 M12;M21 M22];
+
+  C11 = 0.5*tetha2*block.ContStates.Data(4)*sin(2*block.ContStates.Data(2));
+  C12 = -tetha3*block.ContStates.Data(4)*sin(block.ContStates.Data(2)) + 0.5*tetha2*block.ContStates.Data(3)*sin(2*block.ContStates.Data(2));
+  C21 = -0.5*tetha2*block.ContStates.Data(3)*sin(2*block.ContStates.Data(2));
+  C22 = 0;
+
+  C = [C11 C12;C21 C22];
+  g1 = 0;
+  g2 = -tetha5*sin(block.ContStates.Data(2));
+
+  g = [g1;g2];
+
+  fv1 = tetha6*block.ContStates.Data(3);
+  fv2 = tetha7*block.ContStates.Data(4);
+
+  fv = [fv1;fv2];
+
+  fc1 = tetha8*tanh(betha*block.ContStates.Data(3));
+  fc2 = tetha9*tanh(betha*block.ContStates.Data(4));
+  
+  fc = [fc1;fc2];
+    
   Qp = [block.ContStates.Data(3); block.ContStates.Data(4)];
 
-  % Matriz M(theta) 
-  M = [M_2*l_bi^2 + 2*C_x*M_2*l_bi + I_x*sin(block.ContStates.Data(2))*sin(block.ContStates.Data(2))+ I_z + J, C_z*M_2*l_bi*cos(block.ContStates.Data(2)); C_z*M_2*l_bi*cos(block.ContStates.Data(2)), I_x];
-  
+  U = [block.InputPort(1).Data;0];
 
-  % Matriz D(theta, Phi)
-   D=[2*I_x*block.ContStates.Data(4)*cos(block.ContStates.Data(2))*sin(block.ContStates.Data(2)), -C_z*M_2*l_bi*sin(block.ContStates.Data(2))*block.ContStates.Data(4); -I_x*block.ContStates.Data(3)*cos(block.ContStates.Data(2))*sin(block.ContStates.Data(2)), 0];
+  ksup = M\(U - C*Qp - g- fv - fc);
 
-  % Matriz F(theta)
- 
-  F = [0; C_z*M_2*g*sin(block.ContStates.Data(2))];
-
-   %Matriz U
-   U = [block.InputPort(1).Data;0];
-    
-    
-   %ksup ksu(1) = d2phi ksu(2) = d2theta
-    ksup= M\(U -D*Qp -F);
- 
-
-
-  % Derivadas [dPhi,dTheta,d2Phi,d2Theta,di]
-  dx = [block.ContStates.Data(3); block.ContStates.Data(4); ksup(1);ksup(2)];
-  
-
-  % Asignar derivadas al bloque
-  block.Derivatives.Data = dx;
-
+  block.Derivatives.Data = [block.ContStates.Data(3); block.ContStates.Data(4); ksup(1);ksup(2)];
 end
 
 function Output(block)
