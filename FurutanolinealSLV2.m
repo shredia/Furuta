@@ -154,9 +154,9 @@ function Derivative(block)
 
   U = [block.InputPort(1).Data;0];
 
-  ksup = M\(U - C*Qp - g- fv - fc);
+  ksup =    
 
-  block.Derivatives.Data = [q1p; q2p; ksup(1);ksup(2)];
+  block.Derivatives.Data = [block.ContStates.Data(3); block.ContStates.Data(4); ksup(1);ksup(2)];
 end
 
 function Output(block)
