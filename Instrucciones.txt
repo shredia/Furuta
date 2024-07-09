@@ -1,4 +1,21 @@
 Furutanolinealslv2: Es el archivo de ls s-function lvl 2 del pendulo de furuta.
-feedback_linearization: es el simulink de la linearización exacta.
+feedback_linearization: es el simulink de la linearización exacta, no necesaria para correr la simulacion.
 furuta.prj: archivo base del proyecto, ayuda a ordenar el proyecto y poder compartirlo fácilmente.
 Los demás archivos son funciones que ayduaron a modelar y a construir el sistema.
+
+
+Explicacion significado variables:
+q1 corresponde al angulo phi, que es el angulo de la barra que gira en el plano horizontal
+q2 es el angulo theta, correspondiente al pendulo invertido, cuando este angulo es 0, el pendulo estara en la posicion arriba
+
+qd1 es la referencia para el angulo q1
+qd2 es la refrencia para el angulo q2
+
+e1 es qd1-q1
+e2 es qd2-q2
+
+tau es la entrdada del sistema
+y es la salida del sistema
+
+todas las variables que tengan una p al final, como q1p sera la variable q1 derivada, si la p se repite mas de una vez entonces dicha variable estara derivada tantas veces como p's tenga de sufijo 
+
