@@ -1,0 +1,4 @@
+Furutanolinealslv2: Es el archivo de ls s-function lvl 2 del pendulo de furuta.
+feedback_linearization: es el simulink de la linearización exacta.
+furuta.prj: archivo base del proyecto, ayuda a ordenar el proyecto y poder compartirlo fácilmente.
+Los demás archivos son funciones que ayduaron a modelar y a construir el sistema.
